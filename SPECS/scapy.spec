@@ -1,20 +1,11 @@
 Name:           scapy
-Version:        2.4.4
-Release:        5%{?dist}
+Version:        2.5.0
+Release:        1%{?dist}
 Summary:        Interactive packet manipulation tool and network scanner
-
-%global         gituser         secdev
-%global         gitname         scapy
-%global         commit          95ba5b8504152a1f820bbe679ccf03668cb5118f
-%global         shortcommit     %(c=%{commit}; echo ${c:0:7})
 
 License:        GPLv2
 URL:            http://www.secdev.org/projects/scapy/
-#               https://github.com/secdev/scapy/releases
-#               https://bitbucket.org/secdev/scapy/pull-request/80
-#               https://scapy.readthedocs.io/en/latest/introduction.html
-Source0:        https://github.com/%{gituser}/%{gitname}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1:         scapy-2.4.3-libc.patch
+Source0:        https://github.com/secdev/scapy/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %global         common_desc %{expand:
 Scapy is a powerful interactive packet manipulation program built on top
@@ -163,12 +154,10 @@ rm -f %{buildroot}%{python2_sitelib}/*egg-info/requires.txt
 
 # Rename the executables
 mv -f %{buildroot}%{_bindir}/scapy   %{buildroot}%{_bindir}/scapy2
-mv -f %{buildroot}%{_bindir}/UTscapy %{buildroot}%{_bindir}/UTscapy2
 
 %if ! 0%{?with_python3}
 # Link the default to the py2 version of executables if py3 not built
 ln -s %{_bindir}/scapy2   %{buildroot}%{_bindir}/scapy
-ln -s %{_bindir}/UTscapy2 %{buildroot}%{_bindir}/UTscapy
 %endif
 %endif
 
@@ -178,11 +167,9 @@ rm -f %{buildroot}%{python3_sitelib}/*egg-info/requires.txt
 
 # Rename the executables
 mv -f %{buildroot}%{_bindir}/scapy   %{buildroot}%{_bindir}/scapy3
-mv -f %{buildroot}%{_bindir}/UTscapy %{buildroot}%{_bindir}/UTscapy3
 
 # Link the default to the python3 version of executables
 ln -s %{_bindir}/scapy3   %{buildroot}%{_bindir}/scapy
-ln -s %{_bindir}/UTscapy3 %{buildroot}%{_bindir}/UTscapy
 %endif
 
 
@@ -201,10 +188,8 @@ ln -s %{_bindir}/UTscapy3 %{buildroot}%{_bindir}/UTscapy
 %if ! 0%{?with_python3}
 %doc %{_mandir}/man1/scapy.1*
 %{_bindir}/scapy
-%{_bindir}/UTscapy
 %endif
 %{_bindir}/scapy2
-%{_bindir}/UTscapy2
 %{python2_sitelib}/scapy/
 %{python2_sitelib}/scapy-*.egg-info
 %endif
@@ -216,11 +201,10 @@ ln -s %{_bindir}/UTscapy3 %{buildroot}%{_bindir}/UTscapy
 %license LICENSE
 %doc %{_mandir}/man1/scapy.1*
 %{_bindir}/scapy
-%{_bindir}/UTscapy
 %{_bindir}/scapy3
-%{_bindir}/UTscapy3
 %{python3_sitelib}/scapy/
 %{python3_sitelib}/scapy-*.egg-info
+%exclude %{python3_sitelib}/test
 %endif
 
 
@@ -231,11 +215,16 @@ ln -s %{_bindir}/UTscapy3 %{buildroot}%{_bindir}/UTscapy
 
 
 %changelog
+* Fri Jun 23 2023 Andrea Claudi <aclaudi@redhat.com> - 2.5.0-1.el9
+- Don't package scapy tests (Andrea Claudi)
+- Fix scapy compliance with pep-0440 (Andrea Claudi) [2162667]
+- New version 2.5.0 (Andrea Claudi) [RHEL-657]
+
 * Tue Aug 10 2021 Mohan Boddu <mboddu@redhat.com> - 2.4.4-5
 - Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
   Related: rhbz#1991688
 
-* Fri Jul 23 2021 Andrea Claudi <aclaudi@redhat.com> - [2.4.4-4.el9]
+* Fri Jul 23 2021 Andrea Claudi <aclaudi@redhat.com> - 2.4.4-4.el9
 - Don't build scapy-doc package on rhel (Andrea Claudi) [1973720]
 - Enable gating test on RHEL9 (Jianwen Ji) [1974642]
 
