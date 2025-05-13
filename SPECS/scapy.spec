@@ -1,11 +1,12 @@
 Name:           scapy
-Version:        2.5.0
+Version:        2.6.1
 Release:        1%{?dist}
 Summary:        Interactive packet manipulation tool and network scanner
 
 License:        GPLv2
 URL:            http://www.secdev.org/projects/scapy/
 Source0:        https://github.com/secdev/scapy/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1:         scapy-2.6.1-setup-py.patch
 
 %global         common_desc %{expand:
 Scapy is a powerful interactive packet manipulation program built on top
@@ -100,6 +101,14 @@ Summary:        Interactive packet manipulation tool and network scanner
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinx_rtd_theme
 
+%if 0%{?with_python2}
+BuildRequires:  python2-tox
+%endif
+
+%if 0%{?with_python3}
+BuildRequires:  python%{python3_pkgversion}-tox
+%endif
+
 %description doc
 %{common_desc}
 %endif
@@ -130,14 +139,10 @@ done
 %endif
 
 %if 0%{?with_doc}
-# the following commands are copied from tox.ini to avoid a dependency on tox
-pushd doc/scapy
-sphinx-apidoc-%python3_version -f --no-toc --separate --module-first --output-dir api ../../scapy ../../scapy/modules/ ../../scapy/libs/ ../../scapy/tools/ ../../scapy/arch/ ../../scapy/contrib/cansocket* ../../scapy/contrib/scada/* ../../scapy/all.py ../../scapy/layers/all.py
-%{python3} sphinx_apidoc_postprocess.py
-make html BUILDDIR=_build_doc SCAPY_APITREE=0 SPHINXBUILD=sphinx-build-%python3_version
+make -C doc/scapy html BUILDDIR=_build_doc SPHINXBUILD=sphinx-build-%python3_version
 
-rm -f _build_doc/html/.buildinfo
-rm -f _build_doc/html/_static/_dummy
+rm -f doc/scapy/_build_doc/html/.buildinfo
+rm -f doc/scapy/_build_doc/html/_static/_dummy
 popd
 %endif
 
@@ -215,6 +220,9 @@ ln -s %{_bindir}/scapy3   %{buildroot}%{_bindir}/scapy
 
 
 %changelog
+* Thu Dec 05 2024 Andrea Claudi <aclaudi@redhat.com> - 2.6.1-1.el9
+- New version 2.6.1 (Andrea Claudi) [RHEL-657]
+
 * Fri Jun 23 2023 Andrea Claudi <aclaudi@redhat.com> - 2.5.0-1.el9
 - Don't package scapy tests (Andrea Claudi)
 - Fix scapy compliance with pep-0440 (Andrea Claudi) [2162667]
